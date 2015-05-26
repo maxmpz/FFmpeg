@@ -2867,9 +2867,19 @@ static int mov_read_custom_2plus(MOVContext *c, AVIOContext *pb, int size)
             if(sscanf(val, "%*X %X %X %X", &priming, &remainder, &samples) == 3){
                 if(priming>0 && priming<16384)
                     sc->start_pad = priming;
+                // Begin PAMP change: extract itunes mp4 aac end_padding, extract replaygain
+                if(remainder > 0 && remainder <= 4 * 1152) {
+                    char* dict_val = av_malloc(10);
+                    snprintf(dict_val, 10, "%d", remainder);
+                	av_dict_set(&c->fc->metadata, "end_padding", dict_val, AV_DICT_DONT_STRDUP_VAL | AV_DICT_MATCH_CASE);
+                }
             }
-        }
-        if (strcmp(key, "cdec") != 0) {
+		} else if(strcmp(key, "iTunNORM") == 0 || strncmp(key, "replaygain_", 11) == 0) {
+			av_log(NULL, AV_LOG_INFO, "mov meta=%s %s", key, val);
+			av_dict_set(&c->fc->metadata, key, val, AV_DICT_DONT_STRDUP_VAL | AV_DICT_MATCH_CASE | AV_DICT_DONT_STRDUP_KEY);
+			key = val = NULL;
+        } else if (strcmp(key, "cdec") != 0) {
+        	// End PAMP change
             av_dict_set(&c->fc->metadata, key, val,
                         AV_DICT_DONT_STRDUP_KEY | AV_DICT_DONT_STRDUP_VAL);
             key = val = NULL;
