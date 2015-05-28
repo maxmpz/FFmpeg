@@ -54,13 +54,15 @@ typedef struct FileContext {
 } FileContext;
 
 static const AVOption file_options[] = {
-    { "truncate", "truncate existing files on write", offsetof(FileContext, trunc), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, AV_OPT_FLAG_ENCODING_PARAM },
-    { "blocksize", "set I/O operation maximum block size", offsetof(FileContext, blocksize), AV_OPT_TYPE_INT, { .i64 = INT_MAX }, 1, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM },
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+    { "truncate", NULL_IF_CONFIG_SMALL("truncate existing files on write"), offsetof(FileContext, trunc), AV_OPT_TYPE_INT, { .i64 = 1 }, 0, 1, AV_OPT_FLAG_ENCODING_PARAM },
+    { "blocksize", NULL_IF_CONFIG_SMALL("set I/O operation maximum block size"), offsetof(FileContext, blocksize), AV_OPT_TYPE_INT, { .i64 = INT_MAX }, 1, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM },
     { NULL }
 };
 
 static const AVOption pipe_options[] = {
-    { "blocksize", "set I/O operation maximum block size", offsetof(FileContext, blocksize), AV_OPT_TYPE_INT, { .i64 = INT_MAX }, 1, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM },
+    { "blocksize", NULL_IF_CONFIG_SMALL("set I/O operation maximum block size"), offsetof(FileContext, blocksize), AV_OPT_TYPE_INT, { .i64 = INT_MAX }, 1, INT_MAX, AV_OPT_FLAG_ENCODING_PARAM },
+// End PAMP change
     { NULL }
 };
 
