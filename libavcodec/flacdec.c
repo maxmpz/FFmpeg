@@ -644,7 +644,9 @@ static av_cold int flac_decode_close(AVCodecContext *avctx)
 }
 
 static const AVOption options[] = {
-{ "use_buggy_lpc", "emulate old buggy lavc behavior", offsetof(FLACContext, buggy_lpc), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM },
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+{ "use_buggy_lpc", NULL_IF_CONFIG_SMALL("emulate old buggy lavc behavior"), offsetof(FLACContext, buggy_lpc), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM },
+// End PAMP change
 { NULL },
 };
 
