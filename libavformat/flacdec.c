@@ -56,7 +56,11 @@ static int flac_read_header(AVFormatContext *s)
         /* allocate and read metadata block for supported types */
         case FLAC_METADATA_TYPE_STREAMINFO:
         case FLAC_METADATA_TYPE_CUESHEET:
+// Begin PAMP change
+#if !CONFIG_NO_TAG_IMAGES
         case FLAC_METADATA_TYPE_PICTURE:
+#endif
+// End PAMP change
         case FLAC_METADATA_TYPE_VORBIS_COMMENT:
             buffer = av_mallocz(metadata_size + FF_INPUT_BUFFER_PADDING_SIZE);
             if (!buffer) {
@@ -125,6 +129,8 @@ static int flac_read_header(AVFormatContext *s)
                 avpriv_new_chapter(s, track, st->time_base, start, AV_NOPTS_VALUE, isrc);
             }
             av_freep(&buffer);
+// Begin PAMP change
+#if !CONFIG_NO_TAG_IMAGES
         } else if (metadata_type == FLAC_METADATA_TYPE_PICTURE) {
             ret = ff_flac_parse_picture(s, buffer, metadata_size);
             av_freep(&buffer);
@@ -132,6 +138,8 @@ static int flac_read_header(AVFormatContext *s)
                 av_log(s, AV_LOG_ERROR, "Error parsing attached picture.\n");
                 return ret;
             }
+#endif
+// End PAMP change
         } else {
             /* STREAMINFO must be the first block */
             if (!found_streaminfo) {
