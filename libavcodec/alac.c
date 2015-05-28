@@ -645,7 +645,9 @@ static int init_thread_copy(AVCodecContext *avctx)
 }
 
 static const AVOption options[] = {
-    { "extra_bits_bug", "Force non-standard decoding process",
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+    { "extra_bits_bug", NULL_IF_CONFIG_SMALL("Force non-standard decoding process"),
+// End PAMP change
       offsetof(ALACContext, extra_bit_bug), AV_OPT_TYPE_INT, { .i64 = 0 },
       0, 1, AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_DECODING_PARAM },
     { NULL },
