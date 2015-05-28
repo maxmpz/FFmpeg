@@ -41,6 +41,11 @@
 
 #include <float.h>
 
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+#include "avassert.h"
+#endif
+
 #if FF_API_OLD_AVOPTIONS
 const AVOption *av_next_option(FF_CONST_AVUTIL55 void *obj, const AVOption *last)
 {
@@ -263,6 +268,10 @@ static int set_string_number(void *obj, void *target_obj, const AVOption *o, con
 
 static int set_string_image_size(void *obj, const AVOption *o, const char *val, int *dst)
 {
+// Begin PAMP change
+#if 1
+	av_assert0(0);
+#else
     int ret;
 
     if (!val || !strcmp(val, "none")) {
@@ -274,10 +283,16 @@ static int set_string_image_size(void *obj, const AVOption *o, const char *val, 
     if (ret < 0)
         av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as image size\n", val);
     return ret;
+#endif
+// End PAMP change
 }
 
 static int set_string_video_rate(void *obj, const AVOption *o, const char *val, AVRational *dst)
 {
+// Begin PAMP change
+#if 1
+	av_assert0(0);
+#else
     int ret;
     if (!val) {
         ret = AVERROR(EINVAL);
@@ -287,10 +302,16 @@ static int set_string_video_rate(void *obj, const AVOption *o, const char *val, 
     if (ret < 0)
         av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as video rate\n", val);
     return ret;
+#endif
+// End PAMP change
 }
 
 static int set_string_color(void *obj, const AVOption *o, const char *val, uint8_t *dst)
 {
+// Begin PAMP change
+#if 1
+	av_assert0(0);
+#else
     int ret;
 
     if (!val) {
@@ -302,6 +323,8 @@ static int set_string_color(void *obj, const AVOption *o, const char *val, uint8
         return ret;
     }
     return 0;
+#endif
+// End PAMP change
 }
 
 static int set_string_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst,
@@ -346,8 +369,13 @@ static int set_string_fmt(void *obj, const AVOption *o, const char *val, uint8_t
 
 static int set_string_pixel_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst)
 {
+// Begin PAMP change
+#if 1
+	av_assert0(0);
+#else
     return set_string_fmt(obj, o, val, dst,
                           AV_PIX_FMT_NB, av_get_pix_fmt, "pixel format");
+#endif
 }
 
 static int set_string_sample_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst)
@@ -402,9 +430,15 @@ int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
             *(int64_t *)dst = 0;
             return 0;
         } else {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
             if ((ret = av_parse_time(dst, val, 1)) < 0)
                 av_log(obj, AV_LOG_ERROR, "Unable to parse option value \"%s\" as duration\n", val);
             return ret;
+#endif
+// End PAMP change
         }
         break;
     case AV_OPT_TYPE_COLOR:      return set_string_color(obj, o, val, dst);
@@ -732,9 +766,13 @@ int av_opt_get(void *obj, const char *name, int search_flags, uint8_t **out_val)
     case AV_OPT_TYPE_IMAGE_SIZE:
         ret = snprintf(buf, sizeof(buf), "%dx%d", ((int *)dst)[0], ((int *)dst)[1]);
         break;
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
     case AV_OPT_TYPE_PIXEL_FMT:
         ret = snprintf(buf, sizeof(buf), "%s", (char *)av_x_if_null(av_get_pix_fmt_name(*(enum AVPixelFormat *)dst), "none"));
         break;
+#endif
+// End PAMP change
     case AV_OPT_TYPE_SAMPLE_FMT:
         ret = snprintf(buf, sizeof(buf), "%s", (char *)av_x_if_null(av_get_sample_fmt_name(*(enum AVSampleFormat *)dst), "none"));
         break;
@@ -1137,9 +1175,13 @@ static void opt_list(void *obj, void *av_log_obj, const char *unit,
                 AVRational q = av_d2q(opt->default_val.dbl, INT_MAX);
                 av_log(av_log_obj, AV_LOG_INFO, "%d/%d", q.num, q.den); }
                 break;
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
             case AV_OPT_TYPE_PIXEL_FMT:
                 av_log(av_log_obj, AV_LOG_INFO, "%s", (char *)av_x_if_null(av_get_pix_fmt_name(opt->default_val.i64), "none"));
                 break;
+#endif
+// End PAMP change
             case AV_OPT_TYPE_SAMPLE_FMT:
                 av_log(av_log_obj, AV_LOG_INFO, "%s", (char *)av_x_if_null(av_get_sample_fmt_name(opt->default_val.i64), "none"));
                 break;
@@ -1807,25 +1849,43 @@ int av_opt_is_set_to_default(void *obj, const AVOption *o)
         /* Binary and dict have not default support yet. Any pointer is not default. */
         return !!(*(void **)dst);
     case AV_OPT_TYPE_IMAGE_SIZE:
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
         if (!o->default_val.str || !strcmp(o->default_val.str, "none"))
             w = h = 0;
         else if ((ret = av_parse_video_size(&w, &h, o->default_val.str)) < 0)
             return ret;
         return (w == *(int *)dst) && (h == *((int *)dst+1));
+#endif
+// End PAMP change
     case AV_OPT_TYPE_VIDEO_RATE:
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
         q = (AVRational){0, 0};
         if (o->default_val.str) {
             if ((ret = av_parse_video_rate(&q, o->default_val.str)) < 0)
                 return ret;
         }
         return !av_cmp_q(*(AVRational*)dst, q);
+#endif
+// End PAMP change
     case AV_OPT_TYPE_COLOR: {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
         uint8_t color[4] = {0, 0, 0, 0};
         if (o->default_val.str) {
             if ((ret = av_parse_color(color, o->default_val.str, -1, NULL)) < 0)
                 return ret;
         }
         return !memcmp(color, dst, sizeof(color));
+#endif
+// End PAMP change
     }
     default:
         av_log(obj, AV_LOG_WARNING, "Not supported option type: %d, option name: %s\n", o->type, o->name);
