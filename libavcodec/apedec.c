@@ -1549,8 +1549,10 @@ static void ape_flush(AVCodecContext *avctx)
 #define OFFSET(x) offsetof(APEContext, x)
 #define PAR (AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM)
 static const AVOption options[] = {
-    { "max_samples", "maximum number of samples decoded per call",             OFFSET(blocks_per_loop), AV_OPT_TYPE_INT,   { .i64 = 4608 },    1,       INT_MAX, PAR, "max_samples" },
-    { "all",         "no maximum. decode all samples for each packet at once", 0,                       AV_OPT_TYPE_CONST, { .i64 = INT_MAX }, INT_MIN, INT_MAX, PAR, "max_samples" },
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+    { "max_samples", NULL_IF_CONFIG_SMALL("maximum number of samples decoded per call"),             OFFSET(blocks_per_loop), AV_OPT_TYPE_INT,   { .i64 = 4608 },    1,       INT_MAX, PAR, "max_samples" },
+    { "all",         NULL_IF_CONFIG_SMALL("no maximum. decode all samples for each packet at once"), 0,                       AV_OPT_TYPE_CONST, { .i64 = INT_MAX }, INT_MIN, INT_MAX, PAR, "max_samples" },
+// End PAMP change
     { NULL},
 };
 
