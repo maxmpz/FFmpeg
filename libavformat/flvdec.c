@@ -1078,7 +1078,9 @@ static int flv_read_seek(AVFormatContext *s, int stream_index,
 #define OFFSET(x) offsetof(FLVContext, x)
 #define VD AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
 static const AVOption options[] = {
-    { "flv_metadata", "Allocate streams according to the onMetaData array", OFFSET(trust_metadata), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VD },
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+    { "flv_metadata", NULL_IF_CONFIG_SMALL("Allocate streams according to the onMetaData array"), OFFSET(trust_metadata), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, VD },
+// End PAMP change
     { NULL }
 };
 
