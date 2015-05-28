@@ -4447,19 +4447,20 @@ static int mov_read_seek(AVFormatContext *s, int stream_index, int64_t sample_ti
 
 #define OFFSET(x) offsetof(MOVContext, x)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_DECODING_PARAM
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
 static const AVOption mov_options[] = {
     {"use_absolute_path",
-        "allow using absolute path when opening alias, this is a possible security issue",
+    	NULL_IF_CONFIG_SMALL("allow using absolute path when opening alias, this is a possible security issue"),
         OFFSET(use_absolute_path), FF_OPT_TYPE_INT, {.i64 = 0},
         0, 1, FLAGS},
     {"seek_streams_individually",
-        "Seek each stream individually to the to the closest point",
+    		NULL_IF_CONFIG_SMALL("Seek each stream individually to the to the closest point"),
         OFFSET(seek_individually), AV_OPT_TYPE_INT, { .i64 = 1 },
         0, 1, FLAGS},
     {"ignore_editlist", "", OFFSET(ignore_editlist), FF_OPT_TYPE_INT, {.i64 = 0},
         0, 1, FLAGS},
     {"use_mfra_for",
-        "use mfra for fragment timestamps",
+    		NULL_IF_CONFIG_SMALL("use mfra for fragment timestamps"),
         OFFSET(use_mfra_for), FF_OPT_TYPE_INT, {.i64 = FF_MOV_FLAG_MFRA_AUTO},
         -1, FF_MOV_FLAG_MFRA_PTS, FLAGS,
         "use_mfra_for"},
@@ -4469,10 +4470,11 @@ static const AVOption mov_options[] = {
         FLAGS, "use_mfra_for" },
     {"pts", "pts", 0, AV_OPT_TYPE_CONST, {.i64 = FF_MOV_FLAG_MFRA_PTS}, 0, 0,
         FLAGS, "use_mfra_for" },
-    { "export_all", "Export unrecognized metadata entries", OFFSET(export_all),
+    { "export_all", NULL_IF_CONFIG_SMALL("Export unrecognized metadata entries"), OFFSET(export_all),
         AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, .flags = FLAGS },
-    { "export_xmp", "Export full XMP metadata", OFFSET(export_xmp),
+    { "export_xmp", NULL_IF_CONFIG_SMALL("Export full XMP metadata"), OFFSET(export_xmp),
         AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, .flags = FLAGS },
+// End PAMP change
     { NULL },
 };
 
