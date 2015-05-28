@@ -152,6 +152,8 @@ int ff_vorbis_comment(AVFormatContext *as, AVDictionary **m,
              * recommended way of embedding cover art within VorbisComments."
              */
             if (!strcmp(tt, "METADATA_BLOCK_PICTURE") && parse_picture) {
+// Begin PAMP change
+#if !CONFIG_NO_TAG_IMAGES
                 int ret;
                 char *pict = av_malloc(vl);
 
@@ -170,6 +172,11 @@ int ff_vorbis_comment(AVFormatContext *as, AVDictionary **m,
                     av_log(as, AV_LOG_WARNING, "Failed to parse cover art block.\n");
                     continue;
                 }
+#endif
+				av_freep(&tt);
+				av_freep(&ct);
+continue;
+// End PAMP change
             } else if (!ogm_chapter(as, tt, ct)) {
                 updates++;
                 if (av_dict_get(*m, tt, NULL, 0)) {
