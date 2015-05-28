@@ -200,14 +200,18 @@ static void ps_stereo_interpolate_ipdopd_c(float (*l)[2], float (*r)[2],
 
 av_cold void ff_psdsp_init(PSDSPContext *s)
 {
+// Begin PAMP change: no need in c func versions if we have neon versions
+#if !HAVE_NEON
     s->add_squares            = ps_add_squares_c;
     s->mul_pair_single        = ps_mul_pair_single_c;
     s->hybrid_analysis        = ps_hybrid_analysis_c;
-    s->hybrid_analysis_ileave = ps_hybrid_analysis_ileave_c;
     s->hybrid_synthesis_deint = ps_hybrid_synthesis_deint_c;
-    s->decorrelate            = ps_decorrelate_c;
     s->stereo_interpolate[0]  = ps_stereo_interpolate_c;
+#endif
+// End PAMP change
     s->stereo_interpolate[1]  = ps_stereo_interpolate_ipdopd_c;
+    s->hybrid_analysis_ileave = ps_hybrid_analysis_ileave_c;
+    s->decorrelate            = ps_decorrelate_c;
 
     if (ARCH_ARM)
         ff_psdsp_init_arm(s);
