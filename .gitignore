@@ -89,3 +89,5 @@
 /tools/seek_print
 /tools/uncoded_frame
 /tools/zmqsend
+/config-neon.h
+*.mak
