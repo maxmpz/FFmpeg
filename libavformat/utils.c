@@ -4091,6 +4091,8 @@ int ff_find_stream_index(AVFormatContext *s, int id)
     return -1;
 }
 
+// Begin PAMP change
+#if 0
 int64_t ff_iso8601_to_unix_time(const char *datestr)
 {
     struct tm time1 = { 0 }, time2 = { 0 };
@@ -4102,6 +4104,8 @@ int64_t ff_iso8601_to_unix_time(const char *datestr)
     else
         return av_timegm(&time1);
 }
+#endif
+// End PAMP change
 
 int avformat_query_codec(const AVOutputFormat *ofmt, enum AVCodecID codec_id,
                          int std_compliance)
