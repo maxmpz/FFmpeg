@@ -404,7 +404,9 @@ static av_cold int tta_decode_close(AVCodecContext *avctx) {
 #define OFFSET(x) offsetof(TTAContext, x)
 #define DEC (AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM)
 static const AVOption options[] = {
-    { "password", "Set decoding password", OFFSET(pass), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, DEC },
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+    { "password", NULL_IF_CONFIG_SMALL("Set decoding password"), OFFSET(pass), AV_OPT_TYPE_STRING, { .str = NULL }, 0, 0, DEC },
+// End PAMP change
     { NULL },
 };
 
