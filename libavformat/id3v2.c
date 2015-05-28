@@ -546,7 +546,8 @@ static void read_apic(AVFormatContext *s, AVIOContext *pb, int taglen,
     ID3v2ExtraMetaAPIC *apic  = NULL;
     ID3v2ExtraMeta *new_extra = NULL;
     int64_t end               = avio_tell(pb) + taglen;
-
+// Begin PAMP change
+#if !CONFIG_NO_TAG_IMAGES
     if (taglen <= 4 || (!isv34 && taglen <= 6))
         goto fail;
 
@@ -614,6 +615,8 @@ fail:
     if (apic)
         free_apic(apic);
     av_freep(&new_extra);
+#endif
+// End PAMP change
     avio_seek(pb, end, SEEK_SET);
 }
 
