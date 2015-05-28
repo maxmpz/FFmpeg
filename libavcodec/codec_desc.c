@@ -29,6 +29,7 @@
 #define MT(...) (const char *const[]){ __VA_ARGS__, NULL }
 
 static const AVCodecDescriptor codec_descriptors[] = {
+#if !CONFIG_NO_VIDEO
     /* video codecs */
     {
         .id        = AV_CODEC_ID_MPEG1VIDEO,
@@ -1469,6 +1470,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSLESS,
         .mime_types= MT("image/png"),
     },
+#endif // !CONFIG_NO_VIDEO
 
     /* various PCM "codecs" */
     {
@@ -2546,6 +2548,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
     },
 
     /* subtitle codecs */
+#if !CONFIG_NO_VIDEO
     {
         .id        = AV_CODEC_ID_DVD_SUBTITLE,
         .type      = AVMEDIA_TYPE_SUBTITLE,
@@ -2705,7 +2708,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("WebVTT subtitle"),
         .props     = AV_CODEC_PROP_TEXT_SUB,
     },
-
+#endif // !CONFIG_NO_VIDEO
     /* other kind of codecs and pseudo-codecs */
     {
         .id        = AV_CODEC_ID_TTF,
@@ -2769,6 +2772,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
     },
 
     /* deprecated codec ids */
+#if !CONFIG_NO_VIDEO
     {
         .id        = AV_CODEC_ID_BRENDER_PIX_DEPRECATED,
         .type      = AVMEDIA_TYPE_VIDEO,
@@ -2834,7 +2838,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY |
                      AV_CODEC_PROP_LOSSLESS,
     },
-
+#endif // !CONFIG_NO_VIDEO
 #if FF_API_VIMA_DECODER
     {
         .id        = AV_CODEC_ID_VIMA,
