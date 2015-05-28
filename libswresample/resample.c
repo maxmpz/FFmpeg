@@ -192,13 +192,34 @@ static ResampleContext *resample_init(ResampleContext *c, int out_rate, int in_r
 
         switch(c->format){
         case AV_SAMPLE_FMT_S16P:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+        	av_assert0(0);
+#endif
+// End PAMP change
+
             c->filter_shift = 15;
             break;
         case AV_SAMPLE_FMT_S32P:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+        	av_assert0(0);
+#endif
+// End PAMP change
             c->filter_shift = 30;
             break;
         case AV_SAMPLE_FMT_FLTP:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+            c->filter_shift = 0;
+            break;
+#endif
+// End PAMP change
         case AV_SAMPLE_FMT_DBLP:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+        	av_assert0(0);
+#endif
             c->filter_shift = 0;
             break;
         default:

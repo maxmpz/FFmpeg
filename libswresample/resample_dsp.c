@@ -27,6 +27,13 @@
 
 #include "resample.h"
 
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+#include "libavutil/avassert.h"
+#endif
+// End PAMP change
+
+#if !CONFIG_FLOAT_ONLY_RESAMPLER
 #define TEMPLATE_RESAMPLE_S16
 #include "resample_template.c"
 #undef TEMPLATE_RESAMPLE_S16
@@ -34,33 +41,57 @@
 #define TEMPLATE_RESAMPLE_S32
 #include "resample_template.c"
 #undef TEMPLATE_RESAMPLE_S32
+#endif
+// End PAMP change
 
 #define TEMPLATE_RESAMPLE_FLT
 #include "resample_template.c"
 #undef TEMPLATE_RESAMPLE_FLT
 
+// Begin PAMP change
+#if !CONFIG_FLOAT_ONLY_RESAMPLER
 #define TEMPLATE_RESAMPLE_DBL
 #include "resample_template.c"
 #undef TEMPLATE_RESAMPLE_DBL
+#endif
+// End PAMP change
 
 void swri_resample_dsp_init(ResampleContext *c)
 {
     switch(c->format){
     case AV_SAMPLE_FMT_S16P:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+			av_assert0(0);
+#else
         c->dsp.resample_one = resample_one_int16;
         c->dsp.resample     = c->linear ? resample_linear_int16 : resample_common_int16;
+#endif
+// End PAMP change
         break;
     case AV_SAMPLE_FMT_S32P:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+			av_assert0(0);
+#else
         c->dsp.resample_one = resample_one_int32;
         c->dsp.resample     = c->linear ? resample_linear_int32 : resample_common_int32;
+#endif
+// End PAMP change
         break;
     case AV_SAMPLE_FMT_FLTP:
         c->dsp.resample_one = resample_one_float;
         c->dsp.resample     = c->linear ? resample_linear_float : resample_common_float;
         break;
     case AV_SAMPLE_FMT_DBLP:
+// Begin PAMP change
+#if CONFIG_FLOAT_ONLY_RESAMPLER
+			av_assert0(0);
+#else
         c->dsp.resample_one = resample_one_double;
         c->dsp.resample     = c->linear ? resample_linear_double : resample_common_double;
+#endif
+// End PAMP change
         break;
     }
 
