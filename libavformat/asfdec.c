@@ -84,8 +84,10 @@ typedef struct ASFContext {
 } ASFContext;
 
 static const AVOption options[] = {
-    { "no_resync_search", "Don't try to resynchronize by looking for a certain optional start code", offsetof(ASFContext, no_resync_search), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
-    { "export_xmp", "Export full XMP metadata", offsetof(ASFContext, export_xmp), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
+    { "no_resync_search", NULL_IF_CONFIG_SMALL("Don't try to resynchronize by looking for a certain optional start code"), offsetof(ASFContext, no_resync_search), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
+    { "export_xmp", NULL_IF_CONFIG_SMALL("Export full XMP metadata"), offsetof(ASFContext, export_xmp), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
+// End PAMP change
     { NULL },
 };
 
@@ -182,6 +184,8 @@ static int get_value(AVIOContext *pb, int type, int type2_size)
  * but in reality this is only loosely similar */
 static int asf_read_picture(AVFormatContext *s, int len)
 {
+// Begin PAMP change
+#if !CONFIG_NO_TAG_IMAGES
     AVPacket pkt          = { 0 };
     const CodecMime *mime = ff_id3v2_mime_tags;
     enum  AVCodecID id    = AV_CODEC_ID_NONE;
@@ -258,13 +262,16 @@ static int asf_read_picture(AVFormatContext *s, int len)
         av_freep(&desc);
 
     av_dict_set(&st->metadata, "comment", ff_id3v2_picture_types[type], 0);
-
     return 0;
 
 fail:
     av_freep(&desc);
     av_free_packet(&pkt);
     return ret;
+#else
+    return 0;
+#endif
+// End PAMP change
 }
 
 static void get_id3_tag(AVFormatContext *s, int len)
@@ -319,6 +326,7 @@ static void get_tag(AVFormatContext *s, const char *key, int type, int len, int 
                "Unsupported value type %d in tag %s.\n", type, key);
         goto finish;
     }
+
     if (*value)
         av_dict_set(&s->metadata, key, value, 0);
 
@@ -858,7 +866,8 @@ static int asf_read_header(AVFormatContext *s)
             av_log(s, AV_LOG_TRACE, "i=%d, st->codec->codec_type:%d, asf->dar %d:%d sar=%d:%d\n",
                     i, st->codec->codec_type, asf->dar[i].num, asf->dar[i].den,
                     st->sample_aspect_ratio.num, st->sample_aspect_ratio.den);
-
+// Begin PAMP change
+#if 0
             // copy and convert language codes to the frontend
             if (asf->streams[i].stream_language_index < 128) {
                 const char *rfc1766 = asf->stream_languages[asf->streams[i].stream_language_index];
@@ -870,6 +879,8 @@ static int asf_read_header(AVFormatContext *s)
                         av_dict_set(&st->metadata, "language", iso6392, 0);
                 }
             }
+#endif
+// End PAMP change
         }
     }
 
