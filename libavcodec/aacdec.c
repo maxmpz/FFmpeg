@@ -3489,19 +3489,20 @@ static void aacdec_init(AACContext *c)
  * AVOptions for Japanese DTV specific extensions (ADTS only)
  */
 #define AACDEC_FLAGS AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_AUDIO_PARAM
+// Begin PAMP change: use NULL_IF_CONFIG_SMALL for options help labels
 static const AVOption options[] = {
-    {"dual_mono_mode", "Select the channel to decode for dual mono",
+    {"dual_mono_mode", NULL_IF_CONFIG_SMALL("Select the channel to decode for dual mono"),
      offsetof(AACContext, force_dmono_mode), AV_OPT_TYPE_INT, {.i64=-1}, -1, 2,
      AACDEC_FLAGS, "dual_mono_mode"},
 
-    {"auto", "autoselection",            0, AV_OPT_TYPE_CONST, {.i64=-1}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
-    {"main", "Select Main/Left channel", 0, AV_OPT_TYPE_CONST, {.i64= 1}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
-    {"sub" , "Select Sub/Right channel", 0, AV_OPT_TYPE_CONST, {.i64= 2}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
-    {"both", "Select both channels",     0, AV_OPT_TYPE_CONST, {.i64= 0}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
+    {"auto", NULL_IF_CONFIG_SMALL("autoselection"),            0, AV_OPT_TYPE_CONST, {.i64=-1}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
+    {"main", NULL_IF_CONFIG_SMALL("Select Main/Left channel"), 0, AV_OPT_TYPE_CONST, {.i64= 1}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
+    {"sub" , NULL_IF_CONFIG_SMALL("Select Sub/Right channel"), 0, AV_OPT_TYPE_CONST, {.i64= 2}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
+    {"both", NULL_IF_CONFIG_SMALL("Select both channels"),     0, AV_OPT_TYPE_CONST, {.i64= 0}, INT_MIN, INT_MAX, AACDEC_FLAGS, "dual_mono_mode"},
 
     {NULL},
 };
-
+// End PAMP change
 static const AVClass aac_decoder_class = {
     .class_name = "AAC decoder",
     .item_name  = av_default_item_name,
