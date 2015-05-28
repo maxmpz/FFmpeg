@@ -60,6 +60,8 @@ static int ape_tag_read_field(AVFormatContext *s)
         return AVERROR_INVALIDDATA;
     }
     if (flags & APE_TAG_FLAG_IS_BINARY) {
+// Begin PAMP change
+#if !CONFIG_NO_TAG_IMAGES
         uint8_t filename[1024];
         enum AVCodecID id;
         int ret;
@@ -100,6 +102,11 @@ static int ape_tag_read_field(AVFormatContext *s)
                 return AVERROR(ENOMEM);
             st->codec->codec_type = AVMEDIA_TYPE_ATTACHMENT;
         }
+#else
+        avio_seek(s->pb, size, SEEK_CUR);
+		return 0;
+#endif
+// End PAMP change
     } else {
         value = av_malloc(size+1);
         if (!value)
