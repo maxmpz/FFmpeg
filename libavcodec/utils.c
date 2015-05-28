@@ -228,6 +228,8 @@ void avcodec_set_dimensions(AVCodecContext *s, int width, int height)
 
 int ff_set_dimensions(AVCodecContext *s, int width, int height)
 {
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
     int ret = av_image_check_size(width, height, 0, s);
 
     if (ret < 0)
@@ -239,10 +241,16 @@ int ff_set_dimensions(AVCodecContext *s, int width, int height)
     s->height       = FF_CEIL_RSHIFT(height, s->lowres);
 
     return ret;
+#else
+    av_assert0(0);
+#endif
+// End PAMP change
 }
 
 int ff_set_sar(AVCodecContext *avctx, AVRational sar)
 {
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
     int ret = av_image_check_sar(avctx->width, avctx->height, sar);
 
     if (ret < 0) {
@@ -254,6 +262,10 @@ int ff_set_sar(AVCodecContext *avctx, AVRational sar)
         avctx->sample_aspect_ratio = sar;
     }
     return 0;
+#else
+    av_assert0(0);
+#endif
+// End PAMP change
 }
 
 int ff_side_data_update_matrix_encoding(AVFrame *frame,
@@ -279,6 +291,10 @@ int ff_side_data_update_matrix_encoding(AVFrame *frame,
 void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
                                int linesize_align[AV_NUM_DATA_POINTERS])
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
     int i;
     int w_align = 1;
     int h_align = 1;
@@ -435,10 +451,16 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
 
     for (i = 0; i < 4; i++)
         linesize_align[i] = STRIDE_ALIGN;
+#endif
+// End PAMP change
 }
 
 void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height)
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->pix_fmt);
     int chroma_shift = desc->log2_chroma_w;
     int linesize_align[AV_NUM_DATA_POINTERS];
@@ -450,6 +472,8 @@ void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height)
     linesize_align[2] <<= chroma_shift;
     align               = FFMAX3(align, linesize_align[1], linesize_align[2]);
     *width              = FFALIGN(*width, align);
+#endif
+// End PAMP change
 }
 
 int avcodec_enum_to_chroma_pos(int *xpos, int *ypos, enum AVChromaLocation pos)
@@ -518,6 +542,10 @@ static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
 
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_VIDEO: {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+    	av_assert0(0);
+#else
         AVPicture picture;
         int size[4] = { 0 };
         int w = frame->width;
@@ -568,7 +596,7 @@ static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
         pool->format = frame->format;
         pool->width  = frame->width;
         pool->height = frame->height;
-
+#endif
         break;
         }
     case AVMEDIA_TYPE_AUDIO: {
@@ -655,6 +683,8 @@ fail:
     return AVERROR(ENOMEM);
 }
 
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
 static int video_get_buffer(AVCodecContext *s, AVFrame *pic)
 {
     FramePool *pool = s->internal->pool;
@@ -692,9 +722,15 @@ fail:
     av_frame_unref(pic);
     return AVERROR(ENOMEM);
 }
+#endif
+// End PAMP change
 
 void avpriv_color_frame(AVFrame *frame, const int c[4])
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+		av_assert0(0);
+#else
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
     int p, y, x;
 
@@ -714,6 +750,8 @@ void avpriv_color_frame(AVFrame *frame, const int c[4])
             dst += frame->linesize[p];
         }
     }
+#endif
+// End PAMP change
 }
 
 int avcodec_default_get_buffer2(AVCodecContext *avctx, AVFrame *frame, int flags)
@@ -731,7 +769,13 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+		av_assert0(0);
+#else
         return video_get_buffer(avctx, frame);
+#endif
+// End PAMP change
     case AVMEDIA_TYPE_AUDIO:
         return audio_get_buffer(avctx, frame);
     default:
@@ -793,6 +837,10 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
 
     switch (avctx->codec->type) {
     case AVMEDIA_TYPE_VIDEO:
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+		av_assert0(0);
+#else
         frame->format              = avctx->pix_fmt;
         if (!frame->sample_aspect_ratio.num)
             frame->sample_aspect_ratio = avctx->sample_aspect_ratio;
@@ -805,7 +853,8 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
                    frame->sample_aspect_ratio.den);
             frame->sample_aspect_ratio = (AVRational){ 0, 1 };
         }
-
+#endif
+// End PAMP change
         break;
     case AVMEDIA_TYPE_AUDIO:
         if (!frame->sample_rate)
@@ -877,6 +926,10 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
     int ret;
 
     if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+		av_assert0(0);
+#else
         if ((ret = av_image_check_size(avctx->width, avctx->height, 0, avctx)) < 0 || avctx->pix_fmt<0) {
             av_log(avctx, AV_LOG_ERROR, "video_get_buffer: image parameters invalid\n");
             return AVERROR(EINVAL);
@@ -888,6 +941,8 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
             frame->height = FFMAX(avctx->height, FF_CEIL_RSHIFT(avctx->coded_height, avctx->lowres));
             override_dimensions = 0;
         }
+#endif
+// End PAMP change
     }
     ret = ff_decode_frame_props(avctx, frame);
     if (ret < 0)
@@ -963,6 +1018,10 @@ do {                                                                    \
 } while (0)
 
         if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+		av_assert0(0);
+#else
             const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
 
             planes = av_pix_fmt_count_planes(frame->format);
@@ -981,6 +1040,8 @@ do {                                                                    \
 
                 WRAP_PLANE(frame->buf[i], frame->data[i], plane_size);
             }
+#endif
+// End PAMP change
         } else {
             int planar = av_sample_fmt_is_planar(frame->format);
             planes = planar ? avctx->channels : 1;
@@ -1040,6 +1101,8 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
     return ret;
 }
 
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
 static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
 {
     AVFrame *tmp;
@@ -1078,13 +1141,21 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
 
     return 0;
 }
+#endif
+// End PAMP change
 
 int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame)
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+		av_assert0(0);
+#else
     int ret = reget_buffer_internal(avctx, frame);
     if (ret < 0)
         av_log(avctx, AV_LOG_ERROR, "reget_buffer() failed\n");
     return ret;
+#endif
+// End PAMP change
 }
 
 #if FF_API_GET_BUFFER
@@ -1137,17 +1208,27 @@ enum AVPixelFormat avpriv_find_pix_fmt(const PixelFormatTag *tags,
     return AV_PIX_FMT_NONE;
 }
 
+// Begin PAMP change
+#if !CONFIG_NO_VIDEO
 static int is_hwaccel_pix_fmt(enum AVPixelFormat pix_fmt)
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
     return desc->flags & AV_PIX_FMT_FLAG_HWACCEL;
 }
+#endif
+// End PAMP change
 
 enum AVPixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum AVPixelFormat *fmt)
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
     while (*fmt != AV_PIX_FMT_NONE && is_hwaccel_pix_fmt(*fmt))
         ++fmt;
     return fmt[0];
+#endif
+// End PAMP change
 }
 
 static AVHWAccel *find_hwaccel(enum AVCodecID codec_id,
@@ -1197,6 +1278,10 @@ static int setup_hwaccel(AVCodecContext *avctx,
 
 int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
     const AVPixFmtDescriptor *desc;
     enum AVPixelFormat *choices;
     enum AVPixelFormat ret;
@@ -1248,6 +1333,8 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
 
     av_freep(&choices);
     return ret;
+#endif
+// End PAMP change
 }
 
 #if FF_API_AVFRAME_LAVC
@@ -1413,6 +1500,12 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
     }
 
     if ((avctx->coded_width || avctx->coded_height || avctx->width || avctx->height)
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+    )
+    	av_assert0(0);
+#else
+
         && (  av_image_check_size(avctx->coded_width, avctx->coded_height, 0, avctx) < 0
            || av_image_check_size(avctx->width,       avctx->height,       0, avctx) < 0)) {
         av_log(avctx, AV_LOG_WARNING, "Ignoring invalid width/height values\n");
@@ -1428,6 +1521,8 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
             avctx->sample_aspect_ratio = (AVRational){ 0, 1 };
         }
     }
+#endif
+// End PAMP change
 
     /* if the decoder init function was already called previously,
      * free the already allocated subtitle_header before overwriting it */
@@ -1533,6 +1628,10 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
             }
         }
         if (avctx->codec->pix_fmts) {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
             for (i = 0; avctx->codec->pix_fmts[i] != AV_PIX_FMT_NONE; i++)
                 if (avctx->pix_fmt == avctx->codec->pix_fmts[i])
                     break;
@@ -1552,6 +1651,8 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
                 avctx->codec->pix_fmts[i] == AV_PIX_FMT_YUVJ440P ||
                 avctx->codec->pix_fmts[i] == AV_PIX_FMT_YUVJ444P)
                 avctx->color_range = AVCOL_RANGE_JPEG;
+#endif
+// End PAMP change
         }
         if (avctx->codec->supported_samplerates) {
             for (i = 0; avctx->codec->supported_samplerates[i] != 0; i++)
@@ -2103,6 +2204,10 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
                                               const AVFrame *frame,
                                               int *got_packet_ptr)
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
     int ret;
     AVPacket user_pkt = *avpkt;
     int needs_realloc = !user_pkt.data;
@@ -2182,6 +2287,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
     emms_c();
     return ret;
+#endif
+// End PAMP change
 }
 
 int avcodec_encode_subtitle(AVCodecContext *avctx, uint8_t *buf, int buf_size,
@@ -2353,6 +2460,10 @@ int attribute_align_arg avcodec_decode_video2(AVCodecContext *avctx, AVFrame *pi
                                               int *got_picture_ptr,
                                               const AVPacket *avpkt)
 {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
     AVCodecInternal *avci = avctx->internal;
     int ret;
     // copy to ensure we do not change avpkt
@@ -2440,6 +2551,8 @@ fail:
 #endif
 
     return ret;
+#endif
+// End PAMP change
 }
 
 #if FF_API_OLD_DECODE_AUDIO
@@ -3057,6 +3170,11 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     switch (enc->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
         {
+// Begin PAMP change
+#if CONFIG_NO_VIDEO
+	av_assert0(0);
+#else
+
             char detail[256] = "(";
 
             av_strlcat(buf, separator, buf_size);
@@ -3095,8 +3213,9 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
                 detail[strlen(detail) - 2] = 0;
                 av_strlcatf(buf, buf_size, "%s)", detail);
             }
+#endif
+// End PAMP change
         }
-
         if (enc->width) {
             av_strlcat(buf, new_line ? separator : ", ", buf_size);
 
