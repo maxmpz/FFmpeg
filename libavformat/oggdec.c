@@ -41,20 +41,36 @@
 
 static const struct ogg_codec * const ogg_codecs[] = {
     &ff_skeleton_codec,
+// Begin PAMP change: no need many ogg non-audio codecs
+#if CONFIG_OGG_DIRAC
     &ff_dirac_codec,
+#endif
+#if CONFIG_OGG_SPEEX
     &ff_speex_codec,
+#endif
     &ff_vorbis_codec,
+#if CONFIG_OGG_THEORA
     &ff_theora_codec,
+#endif
     &ff_flac_codec,
+#if CONFIG_OGG_CELT
     &ff_celt_codec,
+#endif
     &ff_opus_codec,
+#if CONFIG_OGG_VP8
     &ff_vp8_codec,
+#endif
+#if CONFIG_OGG_DIRAC
     &ff_old_dirac_codec,
+#endif
     &ff_old_flac_codec,
+#if CONFIG_OGG_OGM
     &ff_ogm_video_codec,
     &ff_ogm_audio_codec,
     &ff_ogm_text_codec,
     &ff_ogm_old_codec,
+#endif
+// End PAMP change
     NULL
 };
 
@@ -856,10 +872,14 @@ static int64_t ogg_read_timestamp(AVFormatContext *s, int stream_index,
         if (i == stream_index) {
             struct ogg_stream *os = ogg->streams + stream_index;
             // Do not trust the last timestamps of a ogm video
+// Begin PAMP change: no need many ogg non-audio codecs
+#if CONFIG_OGG_OGM
             if (    (os->flags & OGG_FLAG_EOS)
                 && !(os->flags & OGG_FLAG_BOS)
                 && os->codec == &ff_ogm_video_codec)
                 continue;
+#endif
+// End PAMP change
             pts = ogg_calc_pts(s, i, NULL);
             ogg_validate_keyframe(s, i, pstart, psize);
             if (os->pflags & AV_PKT_FLAG_KEY) {
