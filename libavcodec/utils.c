@@ -3171,10 +3171,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     case AVMEDIA_TYPE_VIDEO:
         {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
-	av_assert0(0);
-#else
-
+#if !CONFIG_NO_VIDEO
             char detail[256] = "(";
 
             av_strlcat(buf, separator, buf_size);
