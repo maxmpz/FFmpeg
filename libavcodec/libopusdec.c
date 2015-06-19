@@ -134,12 +134,13 @@ static int libopus_decode(AVCodecContext *avc, void *data,
     frame->nb_samples = MAX_FRAME_SIZE;
     if ((ret = ff_get_buffer(avc, frame, 0)) < 0)
         return ret;
-
+#if !PAMP_CHANGES
     if (avc->sample_fmt == AV_SAMPLE_FMT_S16)
         nb_samples = opus_multistream_decode(opus->dec, pkt->data, pkt->size,
                                              (opus_int16 *)frame->data[0],
                                              frame->nb_samples, 0);
     else
+#endif
         nb_samples = opus_multistream_decode_float(opus->dec, pkt->data, pkt->size,
                                                    (float *)frame->data[0],
                                                    frame->nb_samples, 0);

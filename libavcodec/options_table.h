@@ -46,7 +46,7 @@
 static const AVOption avcodec_options[] = {
 {"b", N("set bitrate (in bits/s)"), OFFSET(bit_rate), AV_OPT_TYPE_INT, {.i64 = AV_CODEC_DEFAULT_BITRATE }, 0, INT_MAX, A|V|E},
 {"ab", N("set bitrate (in bits/s)"), OFFSET(bit_rate), AV_OPT_TYPE_INT, {.i64 = 128*1000 }, 0, INT_MAX, A|E},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"bt", N("Set video bitrate tolerance (in bits/s). In 1-pass mode, bitrate tolerance specifies how far "
        "ratecontrol is willing to deviate from the target average bitrate value. This is not related "
        "to minimum/maximum bitrate. Lowering tolerance too much has an adverse effect on quality."),
@@ -54,7 +54,7 @@ static const AVOption avcodec_options[] = {
 #endif
 {"flags", NULL, OFFSET(flags), AV_OPT_TYPE_FLAGS, {.i64 = DEFAULT }, 0, UINT_MAX, V|A|S|E|D, "flags"},
 {"unaligned", N("allow decoders to produce unaligned output"), 0, AV_OPT_TYPE_CONST, { .i64 = CODEC_FLAG_UNALIGNED }, INT_MIN, INT_MAX, V | D, "flags" },
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"mv4", N("use four motion vectors per macroblock (MPEG-4)"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_4MV }, INT_MIN, INT_MAX, V|E, "flags"},
 {"qpel", N("use 1/4-pel motion compensation"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_QPEL }, INT_MIN, INT_MAX, V|E, "flags"},
 {"loop", N("use loop filter"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_LOOP_FILTER }, INT_MIN, INT_MAX, V|E, "flags"},
@@ -84,7 +84,7 @@ static const AVOption avcodec_options[] = {
 {"global_header", N("place global headers in extradata instead of every keyframe"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_GLOBAL_HEADER }, INT_MIN, INT_MAX, V|A|E, "flags"},
 #endif
 {"bitexact", N("use only bitexact functions (except (I)DCT)"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_BITEXACT }, INT_MIN, INT_MAX, A|V|S|D|E, "flags"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"aic", N("H.263 advanced intra coding / MPEG-4 AC prediction"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_AC_PRED }, INT_MIN, INT_MAX, V|E, "flags"},
 {"ilme", N("interlaced motion estimation"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_INTERLACED_ME }, INT_MIN, INT_MAX, V|E, "flags"},
 {"cgop", N("closed GOP"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG_CLOSED_GOP }, INT_MIN, INT_MAX, V|E, "flags"},
@@ -94,13 +94,13 @@ static const AVOption avcodec_options[] = {
 {"ignorecrop", N("ignore cropping information from sps"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG2_IGNORE_CROP }, INT_MIN, INT_MAX, V|D, "flags2"},
 #endif
 {"local_header", N("place global headers at every keyframe instead of in extradata"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG2_LOCAL_HEADER }, INT_MIN, INT_MAX, V|E, "flags2"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"chunks", N("Frame data might be split into multiple chunks"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG2_CHUNKS }, INT_MIN, INT_MAX, V|D, "flags2"},
 {"showall", N("Show all frames before the first keyframe"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG2_SHOW_ALL }, INT_MIN, INT_MAX, V|D, "flags2"},
 {"export_mvs", N("export motion vectors through frame side data"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG2_EXPORT_MVS}, INT_MIN, INT_MAX, V|D, "flags2"},
 #endif
 {"skip_manual", N("do not skip samples and export skip information as frame side data"), 0, AV_OPT_TYPE_CONST, {.i64 = CODEC_FLAG2_SKIP_MANUAL}, INT_MIN, INT_MAX, V|D, "flags2"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"me_method", N("set motion estimation method"), OFFSET(me_method), AV_OPT_TYPE_INT, {.i64 = ME_EPZS }, INT_MIN, INT_MAX, V|E, "me_method"},
 {"zero", N("zero motion estimation (fastest)"), 0, AV_OPT_TYPE_CONST, {.i64 = ME_ZERO }, INT_MIN, INT_MAX, V|E, "me_method" },
 {"full", N("full motion estimation (slowest)"), 0, AV_OPT_TYPE_CONST, {.i64 = ME_FULL }, INT_MIN, INT_MAX, V|E, "me_method" },
@@ -116,7 +116,7 @@ static const AVOption avcodec_options[] = {
 {"iter", N("iter motion estimation"), 0, AV_OPT_TYPE_CONST, {.i64 = ME_ITER }, INT_MIN, INT_MAX, V|E, "me_method" },
 #endif
 {"time_base", NULL, OFFSET(time_base), AV_OPT_TYPE_RATIONAL, {.dbl = 0}, INT_MIN, INT_MAX},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"g", N("set the group of picture (GOP) size"), OFFSET(gop_size), AV_OPT_TYPE_INT, {.i64 = 12 }, INT_MIN, INT_MAX, V|E},
 #endif
 {"ar", N("set audio sampling rate (in Hz)"), OFFSET(sample_rate), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, 0, INT_MAX, A|D|E},
@@ -125,7 +125,7 @@ static const AVOption avcodec_options[] = {
 {"frame_size", NULL, OFFSET(frame_size), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, A|E},
 {"frame_number", NULL, OFFSET(frame_number), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
 {"delay", NULL, OFFSET(delay), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"qcomp", N("video quantizer scale compression (VBR). Constant of ratecontrol equation. "
           "Recommended range for default rc_eq: 0.0-1.0"),
           OFFSET(qcompress), AV_OPT_TYPE_FLOAT, {.dbl = 0.5 }, -FLT_MAX, FLT_MAX, V|E},
@@ -151,7 +151,7 @@ static const AVOption avcodec_options[] = {
 {"codec_tag", NULL, OFFSET(codec_tag), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
 {"bug", N("work around not autodetected encoder bugs"), OFFSET(workaround_bugs), AV_OPT_TYPE_FLAGS, {.i64 = FF_BUG_AUTODETECT }, INT_MIN, INT_MAX, V|D, "bug"},
 {"autodetect", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_BUG_AUTODETECT }, INT_MIN, INT_MAX, V|D, "bug"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 #if FF_API_OLD_MSMPEG4
 {"old_msmpeg4", N("some old lavc-generated MSMPEG4v3 files (no autodetection)"), 0, AV_OPT_TYPE_CONST, {.i64 = FF_BUG_OLD_MSMPEG4 }, INT_MIN, INT_MAX, V|D, "bug"},
 #endif
@@ -178,7 +178,7 @@ static const AVOption avcodec_options[] = {
 {"normal", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_COMPLIANCE_NORMAL }, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"unofficial", N("allow unofficial extensions"), 0, AV_OPT_TYPE_CONST, {.i64 = FF_COMPLIANCE_UNOFFICIAL }, INT_MIN, INT_MAX, V|D|E, "strict"},
 {"experimental", N("allow non-standardized experimental things"), 0, AV_OPT_TYPE_CONST, {.i64 = FF_COMPLIANCE_EXPERIMENTAL }, INT_MIN, INT_MAX, V|D|E, "strict"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"b_qoffset", N("QP offset between P- and B-frames"), OFFSET(b_quant_offset), AV_OPT_TYPE_FLOAT, {.dbl = 1.25 }, -FLT_MAX, FLT_MAX, V|E},
 {"err_detect", N("set error detection flags"), OFFSET(err_recognition), AV_OPT_TYPE_FLAGS, {.i64 = 0 }, INT_MIN, INT_MAX, A|V|D, "err_detect"},
 {"crccheck", N("verify embedded CRCs"), 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_CRCCHECK }, INT_MIN, INT_MAX, A|V|D, "err_detect"},
@@ -190,11 +190,11 @@ static const AVOption avcodec_options[] = {
 {"careful",    N("consider things that violate the spec, are fast to check and have not been seen in the wild as errors"), 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_CAREFUL }, INT_MIN, INT_MAX, A|V|D, "err_detect"},
 {"compliant",  N("consider all spec non compliancies as errors"), 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_COMPLIANT }, INT_MIN, INT_MAX, A|V|D, "err_detect"},
 {"aggressive", N("consider things that a sane encoder should not do as an error"), 0, AV_OPT_TYPE_CONST, {.i64 = AV_EF_AGGRESSIVE }, INT_MIN, INT_MAX, A|V|D, "err_detect"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"has_b_frames", NULL, OFFSET(has_b_frames), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
 #endif
 {"block_align", NULL, OFFSET(block_align), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"mpeg_quant", N("use MPEG quantizers instead of H.263"), OFFSET(mpeg_quant), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|E},
 #if FF_API_MPV_OPT
 {"qsquish", N("deprecated, use encoder private options instead"), OFFSET(rc_qsquish), AV_OPT_TYPE_FLOAT, {.dbl = DEFAULT }, 0, 99, V|E},
@@ -227,7 +227,7 @@ static const AVOption avcodec_options[] = {
 {"mmx", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_DCT_MMX }, INT_MIN, INT_MAX, V|E, "dct"},
 {"altivec", NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_DCT_ALTIVEC }, INT_MIN, INT_MAX, V|E, "dct"},
 {"faan", N("floating point AAN DCT"), 0, AV_OPT_TYPE_CONST, {.i64 = FF_DCT_FAAN }, INT_MIN, INT_MAX, V|E, "dct"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"lumi_mask", N("compresses bright areas stronger than medium ones"), OFFSET(lumi_masking), AV_OPT_TYPE_FLOAT, {.dbl = 0 }, -FLT_MAX, FLT_MAX, V|E},
 {"tcplx_mask", N("temporal complexity masking"), OFFSET(temporal_cplx_masking), AV_OPT_TYPE_FLOAT, {.dbl = 0 }, -FLT_MAX, FLT_MAX, V|E},
 {"scplx_mask", N("spatial complexity masking"), OFFSET(spatial_cplx_masking), AV_OPT_TYPE_FLOAT, {.dbl = 0 }, -FLT_MAX, FLT_MAX, V|E},
@@ -360,10 +360,10 @@ static const AVOption avcodec_options[] = {
 #if FF_API_ERROR_RATE
 {"error", NULL, OFFSET(error_rate), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|E},
 #endif
-#endif //!CONFIG_NO_VIDEO
+#endif //!PAMP_CONFIG_NO_VIDEO
 {"threads", NULL, OFFSET(thread_count), AV_OPT_TYPE_INT, {.i64 = 1 }, 0, INT_MAX, V|A|E|D, "threads"},
 {"auto", N("autodetect a suitable number of threads to use"), 0, AV_OPT_TYPE_CONST, {.i64 = 0 }, INT_MIN, INT_MAX, V|E|D, "threads"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 #if FF_API_MPV_OPT
 {"me_threshold", N("motion estimation threshold"), OFFSET(me_threshold), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|E},
 {"mb_threshold", N("macroblock threshold"), OFFSET(mb_threshold), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX, V|E},
@@ -438,12 +438,12 @@ static const AVOption avcodec_options[] = {
 {"bits_per_raw_sample", NULL, OFFSET(bits_per_raw_sample), AV_OPT_TYPE_INT, {.i64 = DEFAULT }, INT_MIN, INT_MAX},
 {"channel_layout", NULL, OFFSET(channel_layout), AV_OPT_TYPE_INT64, {.i64 = DEFAULT }, 0, INT64_MAX, A|E|D, "channel_layout"},
 {"request_channel_layout", NULL, OFFSET(request_channel_layout), AV_OPT_TYPE_INT64, {.i64 = DEFAULT }, 0, INT64_MAX, A|D, "request_channel_layout"},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"rc_max_vbv_use", NULL, OFFSET(rc_max_available_vbv_use), AV_OPT_TYPE_FLOAT, {.dbl = 0 }, 0.0, FLT_MAX, V|E},
 {"rc_min_vbv_use", NULL, OFFSET(rc_min_vbv_overflow_use),  AV_OPT_TYPE_FLOAT, {.dbl = 3 },     0.0, FLT_MAX, V|E},
 #endif
 {"ticks_per_frame", NULL, OFFSET(ticks_per_frame), AV_OPT_TYPE_INT, {.i64 = 1 }, 1, INT_MAX, A|V|E|D},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"color_primaries", N("color primaries"), OFFSET(color_primaries), AV_OPT_TYPE_INT, {.i64 = AVCOL_PRI_UNSPECIFIED }, 1, AVCOL_PRI_NB-1, V|E|D, "color_primaries_type"},
 {"bt709",       N("BT.709"),      0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_PRI_BT709 },       INT_MIN, INT_MAX, V|E|D, "color_primaries_type"},
 {"unspecified", N("Unspecified"), 0, AV_OPT_TYPE_CONST, {.i64 = AVCOL_PRI_UNSPECIFIED }, INT_MIN, INT_MAX, V|E|D, "color_primaries_type"},
@@ -509,7 +509,7 @@ static const AVOption avcodec_options[] = {
 {"ka", N("Karaoke"),            0, AV_OPT_TYPE_CONST, {.i64 = AV_AUDIO_SERVICE_TYPE_KARAOKE },           INT_MIN, INT_MAX, A|E, "audio_service_type"},
 {"request_sample_fmt", N("sample format audio decoders should prefer"), OFFSET(request_sample_fmt), AV_OPT_TYPE_SAMPLE_FMT, {.i64=AV_SAMPLE_FMT_NONE}, -1, INT_MAX, A|D, "request_sample_fmt"},
 {"pkt_timebase", NULL, OFFSET(pkt_timebase), AV_OPT_TYPE_RATIONAL, {.dbl = 0 }, 0, INT_MAX, 0},
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"sub_charenc", N("set input text subtitles character encoding"), OFFSET(sub_charenc), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, S|D},
 {"sub_charenc_mode", N("set input text subtitles character encoding mode"), OFFSET(sub_charenc_mode), AV_OPT_TYPE_FLAGS, {.i64 = FF_SUB_CHARENC_MODE_AUTOMATIC}, -1, INT_MAX, S|D, "sub_charenc_mode"},
 {"do_nothing",  NULL, 0, AV_OPT_TYPE_CONST, {.i64 = FF_SUB_CHARENC_MODE_DO_NOTHING},  INT_MIN, INT_MAX, S|D, "sub_charenc_mode"},
@@ -528,7 +528,7 @@ static const AVOption avcodec_options[] = {
 {"dump_separator", N("set information dump field separator"), OFFSET(dump_separator), AV_OPT_TYPE_STRING, {.str = NULL}, CHAR_MIN, CHAR_MAX, A|V|S|D|E},
 
 {"codec_whitelist", N("List of decoders that are allowed to be used"), OFFSET(codec_whitelist), AV_OPT_TYPE_STRING, { .str = NULL },  CHAR_MIN, CHAR_MAX, A|V|S|D },
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 {"pixel_format", N("set pixel format"), OFFSET(pix_fmt), AV_OPT_TYPE_PIXEL_FMT, {.i64=AV_PIX_FMT_NONE}, -1, INT_MAX, 0 },
 {"video_size", N("set video size"), OFFSET(width), AV_OPT_TYPE_IMAGE_SIZE, {.str=NULL}, 0, INT_MAX, 0 },
 #endif

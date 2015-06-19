@@ -156,7 +156,7 @@ av_cold int ff_fft_init(FFTContext *s, int nbits, int inverse)
     s->fft_permutation = FF_FFT_PERM_DEFAULT;
 
 // Begin PAMP change: no need in c func versions if we have neon versions
-#if FFT_FLOAT && !HAVE_NEON
+#if FFT_FLOAT && (!HAVE_NEON || !PAMP_CHANGES)
     s->fft_permute = fft_permute_c;
     s->fft_calc    = fft_calc_c;
 #if CONFIG_MDCT

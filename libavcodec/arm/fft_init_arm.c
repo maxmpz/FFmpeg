@@ -40,7 +40,7 @@ av_cold void ff_fft_init_arm(FFTContext *s)
 {
 	int cpu_flags = av_get_cpu_flags();
 // Begin PAMP change: no need in vfp func versions if we have neon versions
-#if !HAVE_NEON
+#if !HAVE_NEON || !PAMP_CHANGES
     if (have_vfp(cpu_flags) && !have_vfpv3(cpu_flags)) {
         s->fft_calc     = ff_fft_calc_vfp;
 #if CONFIG_MDCT

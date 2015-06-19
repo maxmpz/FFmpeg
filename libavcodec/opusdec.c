@@ -158,6 +158,7 @@ static int opus_init_resample(OpusStreamContext *s)
     int ret;
 
     av_opt_set_int(s->swr, "in_sample_rate", s->silk_samplerate, 0);
+    av_log(NULL, AV_LOG_ERROR, "in_sample_rate=%d", s->silk_samplerate);
     ret = swr_init(s->swr);
     if (ret < 0) {
         av_log(s->avctx, AV_LOG_ERROR, "Error opening the resampler.\n");
@@ -569,6 +570,9 @@ static av_cold void opus_decode_flush(AVCodecContext *ctx)
         ff_silk_flush(s->silk);
         ff_celt_flush(s->celt);
     }
+    // Begin PAMP change
+    ctx->internal->skip_samples = ctx->delay;
+    // End PAMP change
 }
 
 static av_cold int opus_decode_close(AVCodecContext *avctx)
@@ -650,6 +654,13 @@ static av_cold int opus_decode_init(AVCodecContext *avctx)
         av_opt_set_int(s->swr, "out_channel_layout", layout,             0);
         av_opt_set_int(s->swr, "out_sample_rate",    avctx->sample_rate, 0);
         av_opt_set_int(s->swr, "filter_size",        16,                 0);
+// Begin PAMP change - avoid forced resample
+#if PAMP_CHANGES
+        av_opt_set_int(s->swr, "flags",        0,                 0);
+        // Skip initial delay for better gapless
+        avctx->internal->skip_samples = avctx->delay;
+#endif
+// End PAMP change
 
         ret = ff_silk_init(avctx, &s->silk, s->output_channels);
         if (ret < 0)

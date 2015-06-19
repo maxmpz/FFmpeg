@@ -229,7 +229,7 @@ void avcodec_set_dimensions(AVCodecContext *s, int width, int height)
 int ff_set_dimensions(AVCodecContext *s, int width, int height)
 {
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
     int ret = av_image_check_size(width, height, 0, s);
 
     if (ret < 0)
@@ -250,7 +250,7 @@ int ff_set_dimensions(AVCodecContext *s, int width, int height)
 int ff_set_sar(AVCodecContext *avctx, AVRational sar)
 {
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
     int ret = av_image_check_sar(avctx->width, avctx->height, sar);
 
     if (ret < 0) {
@@ -292,7 +292,7 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
                                int linesize_align[AV_NUM_DATA_POINTERS])
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
     int i;
@@ -458,7 +458,7 @@ void avcodec_align_dimensions2(AVCodecContext *s, int *width, int *height,
 void avcodec_align_dimensions(AVCodecContext *s, int *width, int *height)
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(s->pix_fmt);
@@ -543,7 +543,7 @@ static int update_frame_pool(AVCodecContext *avctx, AVFrame *frame)
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_VIDEO: {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
     	av_assert0(0);
 #else
         AVPicture picture;
@@ -684,7 +684,7 @@ fail:
 }
 
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 static int video_get_buffer(AVCodecContext *s, AVFrame *pic)
 {
     FramePool *pool = s->internal->pool;
@@ -728,7 +728,7 @@ fail:
 void avpriv_color_frame(AVFrame *frame, const int c[4])
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 		av_assert0(0);
 #else
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
@@ -770,7 +770,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_VIDEO:
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 		av_assert0(0);
 #else
         return video_get_buffer(avctx, frame);
@@ -838,7 +838,7 @@ int ff_init_buffer_info(AVCodecContext *avctx, AVFrame *frame)
     switch (avctx->codec->type) {
     case AVMEDIA_TYPE_VIDEO:
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 		av_assert0(0);
 #else
         frame->format              = avctx->pix_fmt;
@@ -927,7 +927,7 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
 
     if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 		av_assert0(0);
 #else
         if ((ret = av_image_check_size(avctx->width, avctx->height, 0, avctx)) < 0 || avctx->pix_fmt<0) {
@@ -1019,7 +1019,7 @@ do {                                                                    \
 
         if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 		av_assert0(0);
 #else
             const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(frame->format);
@@ -1102,7 +1102,7 @@ int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
 }
 
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
 {
     AVFrame *tmp;
@@ -1147,7 +1147,7 @@ static int reget_buffer_internal(AVCodecContext *avctx, AVFrame *frame)
 int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame)
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 		av_assert0(0);
 #else
     int ret = reget_buffer_internal(avctx, frame);
@@ -1209,7 +1209,7 @@ enum AVPixelFormat avpriv_find_pix_fmt(const PixelFormatTag *tags,
 }
 
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
 static int is_hwaccel_pix_fmt(enum AVPixelFormat pix_fmt)
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(pix_fmt);
@@ -1221,7 +1221,7 @@ static int is_hwaccel_pix_fmt(enum AVPixelFormat pix_fmt)
 enum AVPixelFormat avcodec_default_get_format(struct AVCodecContext *s, const enum AVPixelFormat *fmt)
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
     while (*fmt != AV_PIX_FMT_NONE && is_hwaccel_pix_fmt(*fmt))
@@ -1279,7 +1279,7 @@ static int setup_hwaccel(AVCodecContext *avctx,
 int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
     const AVPixFmtDescriptor *desc;
@@ -1501,7 +1501,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
 
     if ((avctx->coded_width || avctx->coded_height || avctx->width || avctx->height)
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
     )
     	av_assert0(0);
 #else
@@ -1571,8 +1571,12 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         avctx->time_base.den = avctx->sample_rate;
     }
 
+// Begin PAMP change
+#if !PAMP_CHANGES
     if (!HAVE_THREADS)
         av_log(avctx, AV_LOG_WARNING, "Warning: not compiled with thread support, using thread emulation\n");
+#endif
+// End PAMP change
 
     if (CONFIG_FRAME_THREAD_ENCODER) {
         ff_unlock_avcodec(); //we will instanciate a few encoders thus kick the counter to prevent false detection of a problem
@@ -1629,7 +1633,7 @@ int attribute_align_arg avcodec_open2(AVCodecContext *avctx, const AVCodec *code
         }
         if (avctx->codec->pix_fmts) {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
             for (i = 0; avctx->codec->pix_fmts[i] != AV_PIX_FMT_NONE; i++)
@@ -2205,7 +2209,7 @@ int attribute_align_arg avcodec_encode_video2(AVCodecContext *avctx,
                                               int *got_packet_ptr)
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
     int ret;
@@ -2461,7 +2465,7 @@ int attribute_align_arg avcodec_decode_video2(AVCodecContext *avctx, AVFrame *pi
                                               const AVPacket *avpkt)
 {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
     AVCodecInternal *avci = avctx->internal;
@@ -3171,7 +3175,7 @@ void avcodec_string(char *buf, int buf_size, AVCodecContext *enc, int encode)
     case AVMEDIA_TYPE_VIDEO:
         {
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
             char detail[256] = "(";
 
             av_strlcat(buf, separator, buf_size);

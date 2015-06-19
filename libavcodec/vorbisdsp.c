@@ -24,7 +24,7 @@
 av_cold void ff_vorbisdsp_init(VorbisDSPContext *dsp)
 {
 // Begin PAMP change: no need in vfp func versions if we have neon versions
-#if !HAVE_NEON
+#if !HAVE_NEON || !PAMP_CHANGES
     dsp->vorbis_inverse_coupling = ff_vorbis_inverse_coupling;
 #endif
 // End PAMP change

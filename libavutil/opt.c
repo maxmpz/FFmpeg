@@ -39,10 +39,14 @@
 #include "samplefmt.h"
 #include "bprint.h"
 
+#if PAMP_CHANGES
+#include "avassert.h"
+#endif
+
 #include <float.h>
 
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 #include "avassert.h"
 #endif
 
@@ -269,7 +273,7 @@ static int set_string_number(void *obj, void *target_obj, const AVOption *o, con
 static int set_string_image_size(void *obj, const AVOption *o, const char *val, int *dst)
 {
 // Begin PAMP change
-#if 1
+#if PAMP_CHANGES
 	av_assert0(0);
 #else
     int ret;
@@ -290,7 +294,7 @@ static int set_string_image_size(void *obj, const AVOption *o, const char *val, 
 static int set_string_video_rate(void *obj, const AVOption *o, const char *val, AVRational *dst)
 {
 // Begin PAMP change
-#if 1
+#if PAMP_CHANGES
 	av_assert0(0);
 #else
     int ret;
@@ -309,7 +313,7 @@ static int set_string_video_rate(void *obj, const AVOption *o, const char *val, 
 static int set_string_color(void *obj, const AVOption *o, const char *val, uint8_t *dst)
 {
 // Begin PAMP change
-#if 1
+#if PAMP_CHANGES
 	av_assert0(0);
 #else
     int ret;
@@ -370,7 +374,7 @@ static int set_string_fmt(void *obj, const AVOption *o, const char *val, uint8_t
 static int set_string_pixel_fmt(void *obj, const AVOption *o, const char *val, uint8_t *dst)
 {
 // Begin PAMP change
-#if 1
+#if PAMP_CHANGES
 	av_assert0(0);
 #else
     return set_string_fmt(obj, o, val, dst,
@@ -431,7 +435,7 @@ int av_opt_set(void *obj, const char *name, const char *val, int search_flags)
             return 0;
         } else {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
             if ((ret = av_parse_time(dst, val, 1)) < 0)
@@ -767,7 +771,7 @@ int av_opt_get(void *obj, const char *name, int search_flags, uint8_t **out_val)
         ret = snprintf(buf, sizeof(buf), "%dx%d", ((int *)dst)[0], ((int *)dst)[1]);
         break;
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
     case AV_OPT_TYPE_PIXEL_FMT:
         ret = snprintf(buf, sizeof(buf), "%s", (char *)av_x_if_null(av_get_pix_fmt_name(*(enum AVPixelFormat *)dst), "none"));
         break;
@@ -1176,7 +1180,7 @@ static void opt_list(void *obj, void *av_log_obj, const char *unit,
                 av_log(av_log_obj, AV_LOG_INFO, "%d/%d", q.num, q.den); }
                 break;
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
             case AV_OPT_TYPE_PIXEL_FMT:
                 av_log(av_log_obj, AV_LOG_INFO, "%s", (char *)av_x_if_null(av_get_pix_fmt_name(opt->default_val.i64), "none"));
                 break;
@@ -1850,7 +1854,7 @@ int av_opt_is_set_to_default(void *obj, const AVOption *o)
         return !!(*(void **)dst);
     case AV_OPT_TYPE_IMAGE_SIZE:
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
         if (!o->default_val.str || !strcmp(o->default_val.str, "none"))
@@ -1862,7 +1866,7 @@ int av_opt_is_set_to_default(void *obj, const AVOption *o)
 // End PAMP change
     case AV_OPT_TYPE_VIDEO_RATE:
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
         q = (AVRational){0, 0};
@@ -1875,7 +1879,7 @@ int av_opt_is_set_to_default(void *obj, const AVOption *o)
 // End PAMP change
     case AV_OPT_TYPE_COLOR: {
 // Begin PAMP change
-#if CONFIG_NO_VIDEO
+#if PAMP_CONFIG_NO_VIDEO
 	av_assert0(0);
 #else
         uint8_t color[4] = {0, 0, 0, 0};

@@ -267,7 +267,7 @@ int av_frame_get_buffer(AVFrame *frame, int align)
     if (frame->format < 0)
         return AVERROR(EINVAL);
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
     if (frame->width > 0 && frame->height > 0)
         return get_video_buffer(frame, align);
     else
@@ -684,7 +684,7 @@ int av_frame_copy(AVFrame *dst, const AVFrame *src)
     if (dst->format != src->format || dst->format < 0)
         return AVERROR(EINVAL);
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
     if (dst->width > 0 && dst->height > 0)
         return frame_copy_video(dst, src);
     else

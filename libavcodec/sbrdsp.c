@@ -271,7 +271,7 @@ static void sbr_hf_apply_noise_3(float (*Y)[2], const float *s_m,
 av_cold void ff_sbrdsp_init(SBRDSPContext *s)
 {
 // Begin PAMP change: no need in c func versions if we have neon versions
-#if !HAVE_NEON
+#if !HAVE_NEON || !PAMP_CHANGES
     s->sum64x5 = sbr_sum64x5_c;
     s->sum_square = sbr_sum_square_c;
     s->neg_odd_64 = sbr_neg_odd_64_c;
