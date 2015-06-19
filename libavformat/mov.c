@@ -2868,21 +2868,27 @@ static int mov_read_custom_2plus(MOVContext *c, AVIOContext *pb, int size)
                 if(priming>0 && priming<16384)
                     sc->start_pad = priming;
                 // Begin PAMP change: extract itunes mp4 aac end_padding, extract replaygain
+#if PAMP_CHANGES
                 if(remainder > 0 && remainder <= 4 * 1152) {
                     char* dict_val = av_malloc(10);
                     snprintf(dict_val, 10, "%d", remainder);
                 	av_dict_set(&c->fc->metadata, "end_padding", dict_val, AV_DICT_DONT_STRDUP_VAL | AV_DICT_MATCH_CASE);
                 }
+#endif
+
             }
+#if PAMP_CHANGES
 		} else if(strcmp(key, "iTunNORM") == 0 || strncmp(key, "replaygain_", 11) == 0) {
 			av_log(NULL, AV_LOG_INFO, "mov meta=%s %s", key, val);
 			av_dict_set(&c->fc->metadata, key, val, AV_DICT_DONT_STRDUP_VAL | AV_DICT_MATCH_CASE | AV_DICT_DONT_STRDUP_KEY);
 			key = val = NULL;
+#endif
+#if !PAMP_CONFIG_NO_TAGS
         } else if (strcmp(key, "cdec") != 0) {
-        	// End PAMP change
             av_dict_set(&c->fc->metadata, key, val,
                         AV_DICT_DONT_STRDUP_KEY | AV_DICT_DONT_STRDUP_VAL);
             key = val = NULL;
+#endif
         }
     }
 
@@ -3660,10 +3666,12 @@ static int mov_read_default(MOVContext *c, AVIOContext *pb, MOVAtom atom)
                 break;
             }
 
+#if !PAMP_CONFIG_NO_TAGS
         // container is user data
         if (!parse && (atom.type == MKTAG('u','d','t','a') ||
                        atom.type == MKTAG('i','l','s','t')))
             parse = mov_read_udta_string;
+#endif
 
         if (!parse) { /* skip leaf atoms data */
             avio_skip(pb, a.size);
@@ -4213,11 +4221,15 @@ static int mov_read_header(AVFormatContext *s)
 
         switch (st->codec->codec_type) {
         case AVMEDIA_TYPE_AUDIO:
+// Begin PAMP change
+#if !PAMP_CONFIG_NO_TAGS
             err = ff_replaygain_export(st, s->metadata);
             if (err < 0) {
                 mov_read_close(s);
                 return err;
             }
+#endif
+// End PAMP change
             break;
         case AVMEDIA_TYPE_VIDEO:
             if (sc->display_matrix) {

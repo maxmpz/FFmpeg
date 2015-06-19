@@ -109,7 +109,7 @@ int ff_raw_data_read_header(AVFormatContext *s)
 #define DEC AV_OPT_FLAG_DECODING_PARAM
 const AVOption ff_rawvideo_options[] = {
 // Begin PAMP change
-#if !CONFIG_NO_VIDEO
+#if !PAMP_CONFIG_NO_VIDEO
     { "framerate", "", OFFSET(framerate), AV_OPT_TYPE_VIDEO_RATE, {.str = "25"}, 0, 0, DEC},
 #endif
 // End PAMP change

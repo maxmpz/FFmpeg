@@ -30,6 +30,7 @@
  * files use it as well.
  */
 const AVCodecTag ff_codec_bmp_tags[] = {
+#if !PAMP_CONFIG_NO_VIDEO // Begin PAMP change - no video
     { AV_CODEC_ID_H264,         MKTAG('H', '2', '6', '4') },
     { AV_CODEC_ID_H264,         MKTAG('h', '2', '6', '4') },
     { AV_CODEC_ID_H264,         MKTAG('X', '2', '6', '4') },
@@ -370,6 +371,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_HQX,          MKTAG('C', 'H', 'Q', 'X') },
     { AV_CODEC_ID_TDSC,         MKTAG('T', 'D', 'S', 'C') },
     { AV_CODEC_ID_HQ_HQA,       MKTAG('C', 'U', 'V', 'C') },
+#endif // End PAMP change
     { AV_CODEC_ID_NONE,         0 }
 };
 

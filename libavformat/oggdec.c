@@ -42,29 +42,29 @@
 static const struct ogg_codec * const ogg_codecs[] = {
     &ff_skeleton_codec,
 // Begin PAMP change: no need many ogg non-audio codecs
-#if CONFIG_OGG_DIRAC
+#if CONFIG_DIRAC_DECODER && !PAMP_CHANGES
     &ff_dirac_codec,
 #endif
-#if CONFIG_OGG_SPEEX
+#if !PAMP_CHANGES
     &ff_speex_codec,
 #endif
     &ff_vorbis_codec,
-#if CONFIG_OGG_THEORA
+#if CONFIG_THEORA_DECODER && !PAMP_CHANGES
     &ff_theora_codec,
 #endif
     &ff_flac_codec,
-#if CONFIG_OGG_CELT
+#if CONFIG_LIBCELT_DECODER && !PAMP_CHANGES
     &ff_celt_codec,
 #endif
     &ff_opus_codec,
-#if CONFIG_OGG_VP8
+#if CONFIG_VP8_DECODER && !PAMP_CHANGES
     &ff_vp8_codec,
 #endif
-#if CONFIG_OGG_DIRAC
+#if CONFIG_DIRAC_DECODER && !PAMP_CHANGES
     &ff_old_dirac_codec,
 #endif
     &ff_old_flac_codec,
-#if CONFIG_OGG_OGM
+#if !PAMP_CHANGES
     &ff_ogm_video_codec,
     &ff_ogm_audio_codec,
     &ff_ogm_text_codec,
@@ -873,7 +873,7 @@ static int64_t ogg_read_timestamp(AVFormatContext *s, int stream_index,
             struct ogg_stream *os = ogg->streams + stream_index;
             // Do not trust the last timestamps of a ogm video
 // Begin PAMP change: no need many ogg non-audio codecs
-#if CONFIG_OGG_OGM
+#if !PAMP_CHANGES
             if (    (os->flags & OGG_FLAG_EOS)
                 && !(os->flags & OGG_FLAG_BOS)
                 && os->codec == &ff_ogm_video_codec)
