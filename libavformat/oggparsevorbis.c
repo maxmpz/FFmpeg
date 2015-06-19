@@ -152,8 +152,7 @@ int ff_vorbis_comment(AVFormatContext *as, AVDictionary **m,
              * recommended way of embedding cover art within VorbisComments."
              */
             if (!strcmp(tt, "METADATA_BLOCK_PICTURE") && parse_picture) {
-// Begin PAMP change
-#if !CONFIG_NO_TAG_IMAGES
+#if !PAMP_CONFIG_NO_TAGS // Begin PAMP change - skip everything unrelated to replaygain
                 int ret;
                 char *pict = av_malloc(vl);
 
@@ -172,19 +171,24 @@ int ff_vorbis_comment(AVFormatContext *as, AVDictionary **m,
                     av_log(as, AV_LOG_WARNING, "Failed to parse cover art block.\n");
                     continue;
                 }
-#endif
+#endif // End PAMP change
 				av_freep(&tt);
 				av_freep(&ct);
-continue;
-// End PAMP change
+				continue;
             } else if (!ogm_chapter(as, tt, ct)) {
                 updates++;
+#if PAMP_CONFIG_NO_TAGS // Begin PAMP change - skip everything unrelated to replaygain
+				if(strncasecmp(tt, "replaygain_", 11) == 0) {
+#endif // End PAMP change
                 if (av_dict_get(*m, tt, NULL, 0)) {
                     av_dict_set(m, tt, ";", AV_DICT_APPEND);
                 }
                 av_dict_set(m, tt, ct,
                             AV_DICT_DONT_STRDUP_KEY |
                             AV_DICT_APPEND);
+#if PAMP_CONFIG_NO_TAGS // Begin PAMP change - skip everything unrelated to replaygain
+				}
+#endif // End PAMP change
                 av_freep(&ct);
             }
         }
@@ -197,7 +201,9 @@ continue;
         av_log(as, AV_LOG_INFO,
                "truncated comment header, %i comments not found\n", n);
 
+#if !PAMP_CONFIG_NO_TAGS
     ff_metadata_conv(m, NULL, ff_vorbiscomment_metadata_conv);
+#endif
 
     return updates;
 }
@@ -374,10 +380,13 @@ static int vorbis_header(AVFormatContext *s, int idx)
     } else if (os->buf[os->pstart] == 3) {
         if (vorbis_update_metadata(s, idx) >= 0 && priv->len[1] > 10) {
             unsigned new_len;
-
+// Begin PAMP change
+#if !PAMP_CONFIG_NO_TAGS
             int ret = ff_replaygain_export(st, st->metadata);
             if (ret < 0)
                 return ret;
+#endif
+// End PAMP change
 
             // drop all metadata we parsed and which is not required by libvorbis
             new_len = 7 + 4 + AV_RL32(priv->packet[1] + 7) + 4 + 1;

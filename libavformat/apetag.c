@@ -61,7 +61,7 @@ static int ape_tag_read_field(AVFormatContext *s)
     }
     if (flags & APE_TAG_FLAG_IS_BINARY) {
 // Begin PAMP change
-#if !CONFIG_NO_TAG_IMAGES
+#if !PAMP_CONFIG_NO_TAGS
         uint8_t filename[1024];
         enum AVCodecID id;
         int ret;
@@ -108,6 +108,12 @@ static int ape_tag_read_field(AVFormatContext *s)
 #endif
 // End PAMP change
     } else {
+#if PAMP_CONFIG_NO_TAGS // Begin PAMP change - skip everything unrelated to replaygain
+        if(strncasecmp(key, "replaygain_", 11) != 0) {
+            avio_seek(s->pb, size, SEEK_CUR);
+        	return 0;
+        }
+#endif // End PAMP change
         value = av_malloc(size+1);
         if (!value)
             return AVERROR(ENOMEM);

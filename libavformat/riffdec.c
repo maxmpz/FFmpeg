@@ -200,6 +200,10 @@ int ff_read_riff_info(AVFormatContext *s, int64_t size)
     int64_t start, end, cur;
     AVIOContext *pb = s->pb;
 
+#if PAMP_CONFIG_NO_TAGS // Begin PAMP change
+    avio_skip(pb, size);
+#endif // End PAMP change
+
     start = avio_tell(pb);
     end   = start + size;
 

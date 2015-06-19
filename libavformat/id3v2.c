@@ -333,6 +333,7 @@ static void read_ttag(AVFormatContext *s, AVIOContext *pb, int taglen,
         return;
     }
 
+#if !PAMP_CONFIG_NO_TAGS // Begin PAMP change - skip everything unrelated to replaygain
     if (!(strcmp(key, "TCON") && strcmp(key, "TCO"))                         &&
         (sscanf(dst, "(%d)", &genre) == 1 || sscanf(dst, "%d", &genre) == 1) &&
         genre <= ID3v1_GENRE_MAX) {
@@ -341,6 +342,10 @@ static void read_ttag(AVFormatContext *s, AVIOContext *pb, int taglen,
     } else if (!(strcmp(key, "TXXX") && strcmp(key, "TXX"))) {
         /* dst now contains the key, need to get value */
         key = dst;
+#else // End PAMP change
+    key = dst;
+    if(strncmp(key, "engiTun", 7) == 0 || strncmp(key, "replaygain_", 11) == 0) {
+#endif
         if (decode_str(s, pb, encoding, &dst, &taglen) < 0) {
             av_log(s, AV_LOG_ERROR, "Error reading frame %s, skipped\n", key);
             av_freep(&key);
@@ -351,7 +356,7 @@ static void read_ttag(AVFormatContext *s, AVIOContext *pb, int taglen,
         av_freep(&dst);
 
     if (dst)
-        av_dict_set(metadata, key, dst, dict_flags);
+       av_dict_set(metadata, key, dst, dict_flags);
 }
 
 static void read_uslt(AVFormatContext *s, AVIOContext *pb, int taglen,
@@ -547,7 +552,7 @@ static void read_apic(AVFormatContext *s, AVIOContext *pb, int taglen,
     ID3v2ExtraMeta *new_extra = NULL;
     int64_t end               = avio_tell(pb) + taglen;
 // Begin PAMP change
-#if !CONFIG_NO_TAG_IMAGES
+#if !PAMP_CONFIG_NO_TAGS
     if (taglen <= 4 || (!isv34 && taglen <= 6))
         goto fail;
 
@@ -898,10 +903,14 @@ static void id3v2_parse(AVIOContext *pb, AVDictionary **metadata,
             av_log(s, AV_LOG_WARNING, "Skipping %s ID3v2 frame %s.\n", type, tag);
             avio_skip(pb, tlen);
         /* check for text tag or supported special meta tag */
+#if !PAMP_CONFIG_NO_TAGS
         } else if (tag[0] == 'T' ||
                    !memcmp(tag, "USLT", 4) ||
                    (extra_meta &&
                     (extra_func = get_extra_meta_func(tag, isv34)))) {
+#else
+        } else if (strncmp(tag, "COM", 3) == 0 || strncmp(tag, "TXX", 3) == 0) {
+#endif
             pbx = pb;
 
             if (unsync || tunsync || tcomp) {
@@ -962,14 +971,19 @@ static void id3v2_parse(AVIOContext *pb, AVDictionary **metadata,
                     pbx = &pb_local; // read from sync buffer
                 }
 #endif
+#if !PAMP_CONFIG_NO_TAGS
             if (tag[0] == 'T')
                 /* parse text tag */
+#endif
                 read_ttag(s, pbx, tlen, metadata, tag);
+#if !PAMP_CONFIG_NO_TAGS
+
             else if (!memcmp(tag, "USLT", 4))
                 read_uslt(s, pbx, tlen, metadata);
             else
                 /* parse special meta tag */
                 extra_func->read(s, pbx, tlen, tag, extra_meta, isv34);
+#endif
         } else if (!tag[0]) {
             if (tag[1])
                 av_log(s, AV_LOG_WARNING, "invalid frame id, assuming padding\n");
@@ -1033,10 +1047,12 @@ static void id3v2_read_internal(AVIOContext *pb, AVDictionary **metadata,
             avio_seek(pb, off, SEEK_SET);
         }
     } while (found_header);
+#if !PAMP_CONFIG_NO_TAGS
     ff_metadata_conv(metadata, NULL, ff_id3v2_34_metadata_conv);
     ff_metadata_conv(metadata, NULL, id3v2_2_metadata_conv);
     ff_metadata_conv(metadata, NULL, ff_id3v2_4_metadata_conv);
     merge_date(metadata);
+#endif
 }
 
 void ff_id3v2_read_dict(AVIOContext *pb, AVDictionary **metadata,
@@ -1069,6 +1085,7 @@ void ff_id3v2_free_extra_meta(ID3v2ExtraMeta **extra_meta)
 
 int ff_id3v2_parse_apic(AVFormatContext *s, ID3v2ExtraMeta **extra_meta)
 {
+#if !PAMP_CONFIG_NO_TAGS
     ID3v2ExtraMeta *cur;
 
     for (cur = *extra_meta; cur; cur = cur->next) {
@@ -1100,6 +1117,6 @@ int ff_id3v2_parse_apic(AVFormatContext *s, ID3v2ExtraMeta **extra_meta)
 
         apic->buf = NULL;
     }
-
+#endif
     return 0;
 }

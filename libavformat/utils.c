@@ -2640,9 +2640,11 @@ static int try_decode_frame(AVFormatContext *s, AVStream *st, AVPacket *avpkt,
             goto fail;
         }
 
+#if !PAMP_CONFIG_NO_TAGS // Begin PAMP change
         /* Force thread count to 1 since the H.264 decoder will not extract
          * SPS and PPS to extradata during multi-threaded decoding. */
         av_dict_set(options ? options : &thread_opt, "threads", "1", 0);
+#endif // End PAMP change
         if (s->codec_whitelist)
             av_dict_set(options ? options : &thread_opt, "codec_whitelist", s->codec_whitelist, 0);
         ret = avcodec_open2(st->codec, codec, options ? options : &thread_opt);
@@ -3086,7 +3088,9 @@ int avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
 
         /* Force thread count to 1 since the H.264 decoder will not extract
          * SPS and PPS to extradata during multi-threaded decoding. */
+#if !PAMP_CONFIG_NO_TAGS // Begin PAMP change
         av_dict_set(options ? &options[i] : &thread_opt, "threads", "1", 0);
+#endif // End PAMP change
 
         if (ic->codec_whitelist)
             av_dict_set(options ? &options[i] : &thread_opt, "codec_whitelist", ic->codec_whitelist, 0);
@@ -4092,7 +4096,7 @@ int ff_find_stream_index(AVFormatContext *s, int id)
 }
 
 // Begin PAMP change
-#if 0
+#if !PAMP_CHANGES
 int64_t ff_iso8601_to_unix_time(const char *datestr)
 {
     struct tm time1 = { 0 }, time2 = { 0 };

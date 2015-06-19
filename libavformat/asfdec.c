@@ -184,8 +184,7 @@ static int get_value(AVIOContext *pb, int type, int type2_size)
  * but in reality this is only loosely similar */
 static int asf_read_picture(AVFormatContext *s, int len)
 {
-// Begin PAMP change
-#if !CONFIG_NO_TAG_IMAGES
+#if !PAMP_CONFIG_NO_TAGS // Begin PAMP change
     AVPacket pkt          = { 0 };
     const CodecMime *mime = ff_id3v2_mime_tags;
     enum  AVCodecID id    = AV_CODEC_ID_NONE;
@@ -270,8 +269,7 @@ fail:
     return ret;
 #else
     return 0;
-#endif
-// End PAMP change
+#endif // End PAMP change
 }
 
 static void get_id3_tag(AVFormatContext *s, int len)
@@ -296,6 +294,12 @@ static void get_tag(AVFormatContext *s, const char *key, int type, int len, int 
 
     if (!asf->export_xmp && !strncmp(key, "xmp", 3))
         goto finish;
+
+#if PAMP_CONFIG_NO_TAGS // Begin PAMP change - skip everything unrelated to replaygain
+	if(strncasecmp(key, "replaygain_", 11) != 0) {
+		goto finish;
+	}
+#endif // End PAMP change
 
     value = av_malloc(2 * len + LEN);
     if (!value)
@@ -867,7 +871,7 @@ static int asf_read_header(AVFormatContext *s)
                     i, st->codec->codec_type, asf->dar[i].num, asf->dar[i].den,
                     st->sample_aspect_ratio.num, st->sample_aspect_ratio.den);
 // Begin PAMP change
-#if 0
+#if !PAMP_CHANGES
             // copy and convert language codes to the frontend
             if (asf->streams[i].stream_language_index < 128) {
                 const char *rfc1766 = asf->stream_languages[asf->streams[i].stream_language_index];

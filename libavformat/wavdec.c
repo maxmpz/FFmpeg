@@ -447,8 +447,10 @@ break_loop:
     if (sample_count)
         st->duration = sample_count;
 
+#if !PAMP_CONFIG_NO_TAGS // Begin PAMP change
     ff_metadata_conv_ctx(s, NULL, wav_metadata_conv);
     ff_metadata_conv_ctx(s, NULL, ff_riff_info_conv);
+#endif // End PAMP change
 
     return 0;
 }

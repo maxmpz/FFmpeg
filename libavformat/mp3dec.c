@@ -263,8 +263,29 @@ static void mp3_parse_info_tag(AVFormatContext *s, AVStream *st,
     v   = avio_rb16(s->pb);
 
     if (v == crc) {
+#if !PAMP_CONFIG_NO_TAGS
         ff_replaygain_export_raw(st, r_gain, peak, a_gain, 0);
         av_dict_set(&st->metadata, "encoder", version, 0);
+#else
+        if(r_gain != INT_MIN) {
+            char* str = NULL;
+        	asprintf(&str, "%.6f", r_gain / 100000.0f);
+        	av_log(s, AV_LOG_INFO, "got XING rg track=%s\n", str);
+        	av_dict_set(&st->metadata, "replaygain_track_gain", str, AV_DICT_DONT_STRDUP_VAL);
+        }
+        if(a_gain != INT_MIN) {
+            char* str = NULL;
+        	asprintf(&str, "%.6f", a_gain / 100000.0f);
+        	av_log(s, AV_LOG_INFO, "got XING rg album=%s\n", str);
+        	av_dict_set(&st->metadata, "replaygain_album_gain", str, AV_DICT_DONT_STRDUP_VAL);
+        }
+        if(peak != 0) {
+            char* str = NULL;
+        	asprintf(&str, "%.6f", (float) peak / UINT32_MAX);
+        	av_log(s, AV_LOG_INFO, "got XING rg peak=%s\n", str);
+        	av_dict_set(&st->metadata, "replaygain_album_gain", str, AV_DICT_DONT_STRDUP_VAL);
+        }
+#endif
     }
 }
 
@@ -356,19 +377,24 @@ static int mp3_read_header(AVFormatContext *s)
 
     s->pb->maxsize = -1;
     off = avio_tell(s->pb);
-
+// Begin PAMP change
+#if !PAMP_CONFIG_NO_TAGS
     if (!av_dict_get(s->metadata, "", NULL, AV_DICT_IGNORE_SUFFIX))
         ff_id3v1_read(s);
-
+#endif
+// End PAMP change
     if(s->pb->seekable)
         mp3->filesize = avio_size(s->pb);
 
     if (mp3_parse_vbr_tags(s, st, off) < 0)
         avio_seek(s->pb, off, SEEK_SET);
-
+// Begin PAMP change
+#if !PAMP_CONFIG_NO_TAGS
     ret = ff_replaygain_export(st, s->metadata);
     if (ret < 0)
         return ret;
+#endif
+// End PAMP change
 
     // the seek index is relative to the end of the xing vbr headers
     for (i = 0; i < st->nb_index_entries; i++)
@@ -401,9 +427,14 @@ static int mp3_read_packet(AVFormatContext *s, AVPacket *pkt)
     pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
     pkt->stream_index = 0;
 
+// Begin PAMP change
+#if !PAMP_CONFIG_NO_TAGS // MaxMP: this doesn't seem to prevent ID3V1 from getting into packets when TAG header is not aligned to packet
     if (ret >= ID3v1_TAG_SIZE &&
-        memcmp(&pkt->data[ret - ID3v1_TAG_SIZE], "TAG", 3) == 0)
-        ret -= ID3v1_TAG_SIZE;
+        memcmp(&pkt->data[ret - ID3v1_TAG_SIZE], "TAG", 3) == 0) {
+    	ret -= ID3v1_TAG_SIZE;
+    }
+#endif
+// End PAMP change
 
     /* note: we need to modify the packet size here to handle the last
        packet */

@@ -57,7 +57,7 @@ static int flac_read_header(AVFormatContext *s)
         case FLAC_METADATA_TYPE_STREAMINFO:
         case FLAC_METADATA_TYPE_CUESHEET:
 // Begin PAMP change
-#if !CONFIG_NO_TAG_IMAGES
+#if !PAMP_CONFIG_NO_TAGS
         case FLAC_METADATA_TYPE_PICTURE:
 #endif
 // End PAMP change
@@ -130,7 +130,7 @@ static int flac_read_header(AVFormatContext *s)
             }
             av_freep(&buffer);
 // Begin PAMP change
-#if !CONFIG_NO_TAG_IMAGES
+#if !PAMP_CONFIG_NO_TAGS
         } else if (metadata_type == FLAC_METADATA_TYPE_PICTURE) {
             ret = ff_flac_parse_picture(s, buffer, metadata_size);
             av_freep(&buffer);
@@ -173,9 +173,13 @@ static int flac_read_header(AVFormatContext *s)
         }
     }
 
+// Begin PAMP change
+#if !PAMP_CONFIG_NO_TAGS
     ret = ff_replaygain_export(st, s->metadata);
     if (ret < 0)
         return ret;
+#endif
+// End PAMP change
 
     return 0;
 
